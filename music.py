@@ -78,7 +78,7 @@ class Music(commands.Cog, name='Musica'):
 
         except Exception as e:
             print(e)
-            await ctx.send('El video es demasiado largo y Discord no me permite reproducirlo :(')
+            await ctx.send('El video es demasiado largo o tiene restricción de edad')
             self.queue.pop(0)
 
         await ctx.send(f"🎶 Reproduciendo **{file}** en **{ctx.author.voice.channel.name}** 🔊")

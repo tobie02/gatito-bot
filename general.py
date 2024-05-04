@@ -108,4 +108,24 @@ class General(commands.Cog, name='General'):
             return translated_text
         else:
             return "Error al traducir el texto."
+        
+
+    @commands.command(hidden=True, aliases=['muteall', 'm'])                     # MUTE ALL
+    async def vcmute(self, ctx):
+        if ctx.message.author.id == 209879067879669760:
+            vc = ctx.author.voice.channel
+            for member in vc.members:
+                await member.edit(mute=True)
+        else:
+            await ctx.channel.send("Solo mi creador Tobi puede usar ese comando")
+
+
+    @commands.command(hidden=True, aliases=['unmuteall', 'um'])                       # UNMUTE ALL
+    async def vcunmute(self, ctx):
+        if ctx.message.author.id == 209879067879669760:
+            vc = ctx.author.voice.channel
+            for member in vc.members:
+                await member.edit(mute=False)
+        else:
+            await ctx.channel.send("Solo mi creador Tobi puede usar ese comando")
    

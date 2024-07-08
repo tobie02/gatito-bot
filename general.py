@@ -1,7 +1,9 @@
 import discord
 from discord.ext import commands
 from gtts import gTTS
+from gtts_token import gtts_token
 import requests
+from pydub import AudioSegment
 
 class General(commands.Cog, name='General'):
     def __init__(self, bot):
@@ -86,6 +88,10 @@ class General(commands.Cog, name='General'):
         language = 'es'
         sp = gTTS(text = arg, lang = language, slow = False)
         sp.save(source)
+
+        audio = AudioSegment.from_file("temp/speech.mp3")
+        audio = audio + 10
+        audio.export("temp/speech.mp3", format="mp3")
 
         try:
             source = discord.FFmpegPCMAudio(source)

@@ -36,7 +36,8 @@ class Music(commands.Cog, name='Musica'):
             for video_url in playlist.video_urls:
                 self.queue.append(video_url)
             await ctx.send(f"🎶 Se han añadido **{len(playlist)}** canciones a la playlist")
-            await self.play_song(ctx)
+            if not ctx.guild.voice_client.is_playing():
+                await self.play_song(ctx)
         elif 'youtube.com' in query:
             await self.add_to_queue(ctx, query)
         else:
@@ -63,32 +64,40 @@ class Music(commands.Cog, name='Musica'):
         if len(self.queue) == 1:
             await self.play_song(ctx)
 
+    async def download_song(self, url):
+        try: os.remove('temp/song.mp3')
+        except: pass
+        yt = YouTube(url)
+        stream = yt.streams.filter(only_audio=True).first()
+        output_path = stream.download()
+        _, file = os.path.split(output_path)
+        self.file = file[:-4]
+        os.rename(output_path, "temp/song.mp3")
+
     async def play_song(self, ctx):
         url = self.queue[0]
         try:
-            yt = YouTube(url)
-            stream = yt.streams.filter(only_audio=True).first()
-            output_path = stream.download()
-            _, file = os.path.split(output_path)
-            file = file[:-4]
-
-            try: os.remove('temp/song.mp3')
-            except: pass
-            os.rename(output_path, "temp/song.mp3")
-
+            await self.download_song(url)
         except Exception as e:
             print(e)
             await ctx.send('El video es demasiado largo o tiene restricción de edad')
             self.queue.pop(0)
+            return
 
-        await ctx.send(f"🎶 Reproduciendo **{file}** en **{ctx.author.voice.channel.name}** 🔊")
+        await ctx.send(f"🎶 Reproduciendo **{self.file}** en **{ctx.author.voice.channel.name}** 🔊")
         source = discord.FFmpegPCMAudio(source="temp/song.mp3")
         ctx.guild.voice_client.play(source, after=lambda e: print('terminado', e))
-        while ctx.guild.voice_client.is_playing():
+
+        while ctx.guild.voice_client and ctx.guild.voice_client.is_playing():
             await asyncio.sleep(1)
-        self.queue.pop(0)
-        if len(self.queue) > 0:
-            await self.play_song(ctx)
+
+        if not ctx.guild.voice_client:
+            print('Disconnected from channel. Stopping queue')
+            self.queue = []
+        if ctx.guild.voice_client:
+            self.queue.pop(0)
+            if len(self.queue) > 0:
+                await self.play_song(ctx)
 
     @commands.command(help='Saltear cancion actual de la playlist')
     async def skip(self, ctx):
@@ -103,6 +112,8 @@ class Music(commands.Cog, name='Musica'):
         if len(self.queue) == 0:
             await ctx.send("La cola de reproducción está vacía.")
         else:
+            if len(self.queue) > 10:
+                await ctx.send("Espera, esto esta re largo...")
             try:
                 queue_list = "\n".join([f"{index + 1}. {YouTube(url).title}" for index, url in enumerate(self.queue)])
                 await ctx.send(f"**Cola de reproducción:**\n{queue_list}")

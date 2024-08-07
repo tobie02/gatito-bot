@@ -4,7 +4,7 @@ import os
 from pydub import AudioSegment
 
 
-url = 'https://www.youtube.com/watch?v=6e-fhmoJeok&ab_channel=Bananirou'
+url = 'https://www.youtube.com/watch?v=AEoci8pjC7Y&ab_channel=CentralRecord'
 
 yt = YouTube(url)
 stream = yt.streams.filter(only_audio=True).first()

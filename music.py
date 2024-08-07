@@ -6,6 +6,33 @@ import asyncio
 from pytube import YouTube, Playlist
 from youtube_search import YoutubeSearch
 
+
+'''
+FFMPEG INSTALL HERE
+-------------------
+https://www.geeksforgeeks.org/how-to-install-ffmpeg-on-windows/
+
+PYTUBE FIX
+----------
+cipher.py
+
+line - 30 should be
+var_regex = re.compile(r"^[\w\$_]+\W")
+
+line - 264 should be
+function_patterns = [
+        # https://github.com/ytdl-org/youtube-dl/issues/29326#issuecomment-865985377
+        # https://github.com/yt-dlp/yt-dlp/commit/48416bc4a8f1d5ff07d5977659cb8ece7640dcd8
+        # var Bpa = [iha];
+        # ...
+        # a.C && (b = a.get("n")) && (b = Bpa[0](b), a.set("n", b),
+        # Bpa.length || iha("")) }};
+        # In the above case, `iha` is the relevant function name
+        r'a\.[a-zA-Z]\s*&&\s*\([a-z]\s*=\s*a\.get\("n"\)\)\s*&&.*?\|\|\s*([a-z]+)',
+        r'\([a-z]\s*=\s*([a-zA-Z0-9$]+)(\[\d+\])\([a-z]\)',
+    ]
+'''
+
 class Music(commands.Cog, name='Musica'):
     def __init__(self, bot):
         self.bot = bot
@@ -58,6 +85,10 @@ class Music(commands.Cog, name='Musica'):
             await ctx.send(searches)
 
     async def add_to_queue(self, ctx, url):
+        print((YouTube(url).author.lower() + YouTube(url).title.lower()))
+        #if 'anuel' in (YouTube(url).author.lower() + YouTube(url).title.lower()):
+        #    await ctx.send(f"🎶 Mi amo no me permite reproducir musica horrible como la de Anuel")
+        #    return
         self.queue.append(url)
         await ctx.send(f"🎶 Se ha añadido **{YouTube(url).title}** a la playlist 🔊")
 

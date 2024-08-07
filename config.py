@@ -8,3 +8,4 @@ TOKEN = os.getenv('TOKEN')
 GUILD = 'Aim Paint'
 INFO =  f'{Colores.NEGRITA}{Colores.AZUL}INFO     {Colores.RESET}'
 NAME = f'{Colores.AZUL}Gatito Bot{Colores.RESET}'
+AI = True

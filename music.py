@@ -3,7 +3,7 @@ from discord.ext import commands
 
 import os
 import asyncio
-from pytube import YouTube, Playlist
+from pytubefix import YouTube, Playlist
 from youtube_search import YoutubeSearch
 
 
@@ -31,6 +31,38 @@ function_patterns = [
         r'a\.[a-zA-Z]\s*&&\s*\([a-z]\s*=\s*a\.get\("n"\)\)\s*&&.*?\|\|\s*([a-z]+)',
         r'\([a-z]\s*=\s*([a-zA-Z0-9$]+)(\[\d+\])\([a-z]\)',
     ]
+
+LAST ISSUE AUG 8, 2024 SOLUTION:
+
+line 264 should be:
+function_patterns = [
+        # https://github.com/ytdl-org/youtube-dl/issues/29326#issuecomment-865985377
+        # https://github.com/yt-dlp/yt-dlp/commit/48416bc4a8f1d5ff07d5977659cb8ece7640dcd8
+        # var Bpa = [iha];
+        # ...
+        # a.C && (b = a.get("n")) && (b = Bpa[0](b), a.set("n", b),
+        # Bpa.length || iha("")) }};
+        # In the above case, `iha` is the relevant function name
+        r'a\.[a-zA-Z]\s*&&\s*\([a-z]\s*=\s*a\.get\("n"\)\)\s*&&.*?\|\|\s*([a-z]+)',
+        r'\([a-z]\s*=\s*([a-zA-Z0-9$]+)(\[\d+\])?\([a-z]\)',
+        r'\([a-z]\s*=\s*([a-zA-Z0-9$]+)(\[\d+\])\([a-z]\)',
+    ]
+
+function at 232 should be:
+
+transform_object = get_transform_object(js, var)
+mapper = {}
+for obj in transform_object:
+    # AJ:function(a){a.reverse()} => AJ, function(a){a.reverse()}
+    name, function = obj.split(":", 1)
+    if function == '"jspb"':
+        continue
+    fn = map_functions(function)
+    mapper[name] = fn
+return mapper
+
+
+CHECK IF NEW ISSUES HERE: https://github.com/pytube/pytube/issues
 '''
 
 class Music(commands.Cog, name='Musica'):

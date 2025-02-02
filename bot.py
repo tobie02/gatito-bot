@@ -47,10 +47,12 @@ async def hello(interaction: discord.Interaction):
 # AI Assistant (llama 3.1)
 @bot.event
 async def on_message(message):
+    # Ignorar mensajes del propio bot
     if message.author == bot.user:
         return
 
-    if bot.user.mentioned_in(message):
+    # Verificar si el bot fue mencionado directamente (sin contar @everyone o @here)
+    if bot.user.mentioned_in(message) and not (message.mention_everyone):
         if bot.ai is False:
             await message.channel.send('Estoy durmiendo, intentalo más tarde 😴')
             return
@@ -80,7 +82,9 @@ async def on_message(message):
         await message.channel.send(respuesta)
         return
 
+    # Procesar otros comandos del bot
     await bot.process_commands(message)
+
 
 @bot.event
 async def on_member_join(member):
